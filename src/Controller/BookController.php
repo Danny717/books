@@ -49,10 +49,23 @@ class BookController extends AbstractController
     }
 
     #[Route('/books/create', name: 'create_book',methods: ['POST'])]
-    public function create(Request $request, BookService $bookService): JsonResponse
+    public function create(
+        Request $request,
+        BookService $bookService,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+    ): JsonResponse
     {
         try{
-            return $this->json($bookService->create($request));
+            $jsonContent = $request->getContent();
+            $bookDto = $serializer->deserialize($jsonContent, BookDto::class, 'json');
+            $errors = $validator->validate($bookDto);
+
+            if (count($errors) > 0) {
+                return $this->json(['errors' => $errors[0]->getMessage()], 400);
+            }
+
+            return $this->json($bookService->create($bookDto));
         } catch(\Exception $exception){
             return $this->json($exception->getMessage());
         }
@@ -140,7 +153,7 @@ class BookController extends AbstractController
             $errors = $validator->validate($bookDto);
 
             if (count($errors) > 0) {
-                return $this->json(['errors' => $errors], 400);
+                return $this->json(['errors' => $errors[0]->getMessage()], 400);
             }
 
             return $this->json($bookService->update($id, $bookDto));

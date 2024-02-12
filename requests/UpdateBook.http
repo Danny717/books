@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "title": "Updated book",
   "description": "Updated book description",
-  "createdAt": "2001-01-01",
+  "createdAt": "2001-01-01 00:00:00",
   "authors": [3,4]
 }
 

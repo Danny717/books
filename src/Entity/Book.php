@@ -29,7 +29,7 @@ class Book
     private ?string $description = null;
 
     #[Groups("book")]
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $img = null;
 
     #[Groups("book")]

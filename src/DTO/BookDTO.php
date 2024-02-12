@@ -13,7 +13,7 @@ class BookDTO
     public string $title;
 
     #[Assert\Type('string')]
-    public string $description;
+    public ?string $description;
 
     #[Assert\NotBlank]
     #[Assert\DateTime]
@@ -30,9 +30,9 @@ class BookDTO
         return $this->title;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
-        return $this->description;
+        return $this->description ?? null;
     }
 
     public function getCreatedAt(): \DateTimeImmutable

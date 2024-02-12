@@ -2,13 +2,18 @@
 
 namespace App\Controller;
 
+use App\DTO\AuthorDTO;
+use App\DTO\BookDTO;
 use App\Repository\AuthorRepository;
 use App\Service\AuthorService;
+use App\Service\BookService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AuthorController extends AbstractController
 {
@@ -25,6 +30,7 @@ class AuthorController extends AbstractController
             $items = [];
             foreach ($data->getItems() as $item){
                 $items[] = [
+                    'id' => $item->getId(),
                     'firstname' => $item->getFirstname(),
                     'lastname' => $item->getLastname(),
                     'secondname' => $item->getSecondname(),
@@ -44,10 +50,23 @@ class AuthorController extends AbstractController
     }
 
     #[Route('/authors/create', name: 'create_author', methods: ['POST'],)]
-    public function create(Request $request, AuthorService $authorService): JsonResponse
+    public function create(
+        Request $request,
+        AuthorService $authorService,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+    ): JsonResponse
     {
         try {
-            return $this->json($authorService->create($request));
+            $jsonContent = $request->getContent();
+            $authorDto = $serializer->deserialize($jsonContent, AuthorDTO::class, 'json');
+            $errors = $validator->validate($authorDto);
+
+            if (count($errors) > 0) {
+                return $this->json(['errors' => $errors[0]->getMessage()], 400);
+            }
+
+            return $this->json($authorService->create($authorDto));
         } catch (\Exception $exception){
             return $this->json(['message' => $exception->getMessage(),], 400);
         }

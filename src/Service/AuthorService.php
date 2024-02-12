@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\AuthorDTO;
 use App\Entity\Author;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,20 +25,17 @@ class AuthorService
 
 
 
-    public function create(Request $request): array
+    public function create(AuthorDTO$dto): array
     {
-        $data = $request->getPayload()->all();
-        #dd($data);
         $author = new Author();
-        $author->setLastname($data['lastname'])
-            ->setFirstname($data['firstname'])
-            ->setSecondname($data['secondname'] ?? null);
+        $author->setLastname($dto->getLastname())
+            ->setFirstname($dto->getFirstname())
+            ->setSecondname($dto->getSecondname() ?? null);
 
         $errors = $this->validator->validate($author);
         if (count($errors) > 0){
             throw new ValidatorException($errors);
         }
-
 
         $this->em->persist($author);
         $this->em->flush();
@@ -46,7 +44,7 @@ class AuthorService
             'id' => $author->getId(),
             'firstname' => $author->getFirstname(),
             'lastname' => $author->getLastname(),
-            'secondname' => $author->getSecondname() ?? null,
+            'secondname' => $author->getSecondname(),
         ];
     }
 }
