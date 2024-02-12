@@ -1,0 +1,15 @@
+POST http://books.loc/books/update/2 HTTP/1.1
+Content-Type: application/json
+
+
+{
+  "title": "Updated book",
+  "description": "Updated book description",
+  "createdAt": "2001-01-01",
+  "authors": [3,4]
+}
+
+
+
+
+

@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-
+    images_directory: '../public/images'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -22,3 +22,25 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\FileUploaderService:
+        arguments:
+            $imageUploader: '%images_directory%'
+
+    Symfony\Component\Serializer\Encoder\JsonEncoder:
+    Symfony\Component\Serializer\Normalizer\ObjectNormalizer:
+    Symfony\Component\Serializer\Normalizer\DateTimeNormalizer:
+    Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor:
+
+    Symfony\Component\Serializer\Normalizer\PropertyNormalizer:
+        arguments:
+            $propertyTypeExtractor: '@Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor'
+
+    Symfony\Component\Serializer\SerializerInterface:
+        class: Symfony\Component\Serializer\Serializer
+        arguments:
+            - [
+                '@Symfony\Component\Serializer\Normalizer\PropertyNormalizer',
+                '@Symfony\Component\Serializer\Normalizer\DateTimeNormalizer',
+                '@Symfony\Component\Serializer\Normalizer\ObjectNormalizer'
+            ]
+            - [ '@Symfony\Component\Serializer\Encoder\JsonEncoder' ]

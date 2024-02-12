@@ -1,0 +1,6 @@
+GET http://books.loc/books/author/Smit HTTP/1.1
+Accept: application/json
+
+
+
+

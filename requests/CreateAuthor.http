@@ -1,0 +1,10 @@
+POST http://books.loc/authors/create HTTP/1.1
+Content-Type: application/json
+
+{
+  "firstname": "John",
+  "lastname": "Smith",
+  "secondname": "Jack"
+}
+
+
