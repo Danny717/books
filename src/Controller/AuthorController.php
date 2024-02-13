@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\DTO\AuthorDTO;
-use App\DTO\BookDTO;
 use App\Repository\AuthorRepository;
 use App\Service\AuthorService;
-use App\Service\BookService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +15,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AuthorController extends AbstractController
 {
+    const NUM_PER_PAGE = 3;
     #[Route('/authors', name: 'all_authors', methods: ['GET'],)]
     public function index(Request $request, AuthorRepository $authorRepository, PaginatorInterface $paginator): JsonResponse
     {
@@ -24,7 +23,7 @@ class AuthorController extends AbstractController
             $data = $paginator->paginate(
                 $authorRepository->findAll(),
                 $request->query->getInt('page', 1),
-                3
+                self::NUM_PER_PAGE
             );
 
             $items = [];
@@ -40,9 +39,9 @@ class AuthorController extends AbstractController
             return $this->json([
                 'data' => $items,
                 'currentPage' => $data->getCurrentPageNumber(),
-                'last_page' => ceil($data->getTotalItemCount() / 3),
+                'last_page' => ceil($data->getTotalItemCount() / self::NUM_PER_PAGE),
                 'total_items' => $data->getTotalItemCount(),
-                'limit' => 3,
+                'limit' => self::NUM_PER_PAGE,
             ]);
         } catch (\Exception $exception){
             return $this->json(['message' => $exception->getMessage(),], 400);

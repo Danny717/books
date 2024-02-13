@@ -2,12 +2,10 @@
 
 namespace App\DTO;
 
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class BookDTO
 {
-
     #[Assert\NotBlank]
     #[Assert\Type('string')]
     public string $title;

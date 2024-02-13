@@ -5,10 +5,8 @@ namespace App\Service;
 use App\DTO\AuthorDTO;
 use App\Entity\Author;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-
 
 class AuthorService
 {
@@ -22,8 +20,6 @@ class AuthorService
         $this->em = $em;
         $this->validator = $validator;
     }
-
-
 
     public function create(AuthorDTO$dto): array
     {

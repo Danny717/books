@@ -7,33 +7,26 @@ use App\Entity\Book;
 use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Exception\ValidatorException;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-
 
 class BookService
 {
     private EntityManagerInterface $em;
-    private ValidatorInterface $validator;
 
     private AuthorRepository $authorRepository;
-
+    private FileUploaderService $fileUploaderService;
     private BookRepository $bookRepository;
     public function __construct(
         EntityManagerInterface $em,
-        ValidatorInterface $validator,
         AuthorRepository $authorRepository,
-        BookRepository $bookRepository
+        BookRepository $bookRepository,
+        FileUploaderService $fileUploaderService
     )
     {
         $this->em = $em;
-        $this->validator = $validator;
         $this->authorRepository = $authorRepository;
         $this->bookRepository = $bookRepository;
+        $this->fileUploaderService = $fileUploaderService;
     }
-
-
 
     public function create(BookDTO $dto): array
     {
@@ -58,7 +51,7 @@ class BookService
             'description' => $book->getDescription(),
             'authors' => $this->_getAuthors($book),
             'createdAt' => $book->getCreatedAt(),
-            'img' => $book->getImg()
+            'img' => $book->getImg() ? $this->fileUploaderService->getImageFolder() . '/' . $book->getImg() : null,
         ];
     }
 
@@ -76,12 +69,12 @@ class BookService
                     $book->addAuthor($authorEntity);
                 }
             }
+        } else {
+            throw new \Exception('Book not found', 404);
         }
 
         $this->em->persist($book);
         $this->em->flush();
-
-
 
         return [
             'id' => $book->getId(),
@@ -89,7 +82,7 @@ class BookService
             'description' => $book->getDescription(),
             'authors' => $this->_getAuthors($book),
             'createdAt' => $book->getCreatedAt(),
-            'img' => $book->getImg()
+            'img' => $book->getImg() ? $this->fileUploaderService->getImageFolder() . '/' . $book->getImg() : null,
         ];
     }
 

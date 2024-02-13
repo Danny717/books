@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class BookController extends AbstractController
 {
+    const NUM_PER_PAGE = 3;
     #[Route('/books', name: 'all_book',methods: ['GET'])]
     public function index(
         Request $request,
@@ -31,7 +32,7 @@ class BookController extends AbstractController
             $data = $paginator->paginate(
                 $bookRepository->findAll(),
                 $request->query->getInt('page', 1),
-                3
+                self::NUM_PER_PAGE
             );
 
             $items = $this->_getData($data, $fileUploaderService);
@@ -39,9 +40,9 @@ class BookController extends AbstractController
             return $this->json([
                 'data' => $items,
                 'currentPage' => $data->getCurrentPageNumber(),
-                'last_page' => ceil($data->getTotalItemCount() / 3),
+                'last_page' => ceil($data->getTotalItemCount() / self::NUM_PER_PAGE),
                 'total_items' => $data->getTotalItemCount(),
-                'limit' => 3,
+                'limit' => self::NUM_PER_PAGE,
             ]);
         } catch (\Exception $exception){
             return $this->json(['message' => $exception->getMessage(),], 400);
@@ -89,7 +90,7 @@ class BookController extends AbstractController
             $data = $paginator->paginate(
                 $author->getBooks(),
                 $request->query->getInt('page', 1),
-                3
+                self::NUM_PER_PAGE
             );
 
             $items = $this->_getData($data, $fileUploaderService);
@@ -97,9 +98,9 @@ class BookController extends AbstractController
             return $this->json([
                 'data' => $items,
                 'currentPage' => $data->getCurrentPageNumber(),
-                'last_page' => ceil($data->getTotalItemCount() / 3),
+                'last_page' => ceil($data->getTotalItemCount() / self::NUM_PER_PAGE),
                 'total_items' => $data->getTotalItemCount(),
-                'limit' => 3,
+                'limit' => self::NUM_PER_PAGE,
             ]);
         } catch (\Exception $exception){
             return $this->json(['message' => $exception->getMessage(),], 400);
@@ -145,7 +146,8 @@ class BookController extends AbstractController
         BookService $bookService,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
-        int $id): JsonResponse
+        int $id
+    ): JsonResponse
     {
         try{
             $jsonContent = $request->getContent();
@@ -158,7 +160,7 @@ class BookController extends AbstractController
 
             return $this->json($bookService->update($id, $bookDto));
         } catch(\Exception $exception){
-            return $this->json($exception->getMessage());
+            return $this->json($exception->getMessage(), $exception->getCode());
         }
     }
 
@@ -168,7 +170,8 @@ class BookController extends AbstractController
         FileUploaderService $fileUploaderService,
         BookRepository $bookRepository,
         EntityManagerInterface $em,
-        int $id): JsonResponse
+        int $id
+    ): JsonResponse
     {
         try{
             $book = $bookRepository->find($id);
